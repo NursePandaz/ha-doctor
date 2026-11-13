@@ -1,0 +1,14 @@
+{
+  "domain": "ha_doctor",
+  "name": "HA Doctor",
+  "after_dependencies": ["automation", "script"],
+  "categories": ["computers_network.monitoring"],
+  "codeowners": ["@NursePandaz"],
+  "config_flow": true,
+  "documentation": "https://github.com/NursePandaz/ha-doctor",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/NursePandaz/ha-doctor/issues",
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
