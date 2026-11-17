@@ -1,7 +1,7 @@
 """Inspect live state and the references indexed by Home Assistant."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from homeassistant.components.automation import entities_in_automation
 from homeassistant.components.script import entities_in_script
@@ -9,7 +9,7 @@ from homeassistant.const import ATTR_RESTORED, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State, callback, valid_entity_id
 from homeassistant.helpers import entity_registry as er
 
-from .const import DOMAIN, OUTAGE_THRESHOLD
+from .const import DOMAIN, Settings
 
 
 @dataclass(frozen=True)
@@ -20,22 +20,25 @@ class Report:
     missing: frozenset[tuple[str, str]]
 
 
-def is_persistent_outage(state: State, now: datetime) -> bool:
+def is_persistent_outage(state: State, now: datetime, threshold: timedelta) -> bool:
     """Using last_changed catches recoveries even between two scans."""
     return (
         state.state == STATE_UNAVAILABLE
         and not state.attributes.get(ATTR_RESTORED)
-        and now - state.last_changed >= OUTAGE_THRESHOLD
+        and now - state.last_changed >= threshold
     )
 
 
 @callback
-def async_scan(hass: HomeAssistant, now: datetime) -> Report:
+def async_scan(hass: HomeAssistant, now: datetime, settings: Settings) -> Report:
     """Read one consistent snapshot on the Home Assistant event loop."""
     registry = er.async_get(hass)
     unavailable = set()
+    duration = settings.outage_duration
     for state in hass.states.async_all():
-        if not is_persistent_outage(state, now):
+        if state.entity_id in settings.excluded or not is_persistent_outage(
+            state, now, duration
+        ):
             continue
         entry = registry.async_get(state.entity_id)
         if entry and (entry.disabled or entry.platform == DOMAIN):

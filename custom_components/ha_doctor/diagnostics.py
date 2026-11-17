@@ -5,17 +5,18 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 
 from . import DoctorEntry
-from .const import OUTAGE_THRESHOLD, SCAN_INTERVAL
+from .const import Settings
 
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: DoctorEntry
 ) -> dict[str, Any]:
+    settings = Settings.from_options(entry.options)
     coordinator = entry.runtime_data
     report = coordinator.data
     return {
-        "interval_seconds": int(SCAN_INTERVAL.total_seconds()),
-        "outage_threshold_seconds": int(OUTAGE_THRESHOLD.total_seconds()),
+        "interval_seconds": settings.interval * 60,
+        "outage_threshold_seconds": settings.threshold * 60,
         "scan_status": (
             "failed"
             if not coordinator.last_update_success

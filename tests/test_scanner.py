@@ -27,4 +27,4 @@ def test_persistent_outage(value, age_seconds, attributes, expected):
         attributes,
         last_changed=now - timedelta(seconds=age_seconds),
     )
-    assert is_persistent_outage(state, now) is expected
+    assert is_persistent_outage(state, now, timedelta(minutes=15)) is expected

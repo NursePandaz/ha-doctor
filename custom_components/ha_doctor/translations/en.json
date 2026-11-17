@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Set up HA Doctor",
-        "description": "Scan this Home Assistant for persistent outages and missing entity references. Findings appear under Settings → System → Repairs. You decide what to change."
+        "description": "Check for offline devices and missing links in automations and scripts. HA Doctor groups findings in Repairs. Open Configure on the integration to review each finding or change your preferences."
       }
     },
     "abort": {
@@ -12,8 +12,12 @@
   },
   "entity": {
     "sensor": {
-      "unavailable": {"name": "Persistently unavailable entities"},
-      "missing": {"name": "Missing entity references"}
+      "unavailable": {
+        "name": "Persistently unavailable entities"
+      },
+      "missing": {
+        "name": "Missing entity references"
+      }
     }
   },
   "issues": {
@@ -24,6 +28,86 @@
     "missing": {
       "title": "{source} refers to a missing entity",
       "description": "Home Assistant cannot find `{target}`, which is referenced by `{source}`. Open the automation or script and look for this entity ID. Check whether the target was renamed, removed, or has yet to load before selecting a replacement."
+    },
+    "unavailable_summary": {
+      "title": "Offline entities ({count})",
+      "description": "Some entities have been offline longer than your chosen threshold. Open Configure, then Review offline entities to see their names and troubleshooting steps.\n\n[Open HA Doctor](/config/integrations/integration/ha_doctor)"
+    },
+    "missing_summary": {
+      "title": "Missing references ({count})",
+      "description": "An automation or script points to an entity Home Assistant cannot find. Open Configure, then Review missing references to see each source and its missing target.\n\n[Open HA Doctor](/config/integrations/integration/ha_doctor)"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Home health overview",
+        "description": "**{offline}** offline entities · **{missing}** missing references\n\nChoose a list to see what needs attention and where to look first.",
+        "menu_options": {
+          "unavailable": "Review offline entities",
+          "missing": "Review missing references",
+          "advanced": "Advanced settings"
+        }
+      },
+      "waiting": {
+        "title": "Waiting for a scan",
+        "description": "HA Doctor needs a successful scan to show current findings. If Home Assistant just started, check again in a moment.",
+        "menu_options": {
+          "init": "Check again",
+          "advanced": "Advanced settings"
+        }
+      },
+      "missing": {
+        "title": "Missing references",
+        "description": "Open the named automation or script and look for the entity after the arrow. Check whether it was renamed or removed.\n\n**{start}–{end} of {total}**\n\n{items}",
+        "menu_options": {
+          "init": "Back to overview",
+          "next_page": "Next page",
+          "previous_page": "Previous page"
+        }
+      },
+      "unavailable": {
+        "title": "Offline entities",
+        "description": "Open the device page for an affected entity. If several belong to the same device, start by checking that device’s power or connection.\n\n**{start}–{end} of {total}**\n\n{items}",
+        "menu_options": {
+          "init": "Back to overview",
+          "next_page": "Next page",
+          "previous_page": "Previous page"
+        }
+      },
+      "unavailable_clear": {
+        "title": "Offline entities",
+        "description": "The latest scan found no entities that have been offline long enough to report.",
+        "menu_options": {
+          "init": "Back to overview"
+        }
+      },
+      "missing_clear": {
+        "title": "Missing references",
+        "description": "The latest scan found no missing entity IDs in the automations and scripts it checked.",
+        "menu_options": {
+          "init": "Back to overview"
+        }
+      },
+      "advanced": {
+        "title": "Advanced settings",
+        "description": "Save to apply these preferences and scan again.",
+        "data": {
+          "threshold": "Report an outage after",
+          "interval": "Time between scans",
+          "excluded": "Ignore outages for these entities",
+          "individual": "Show a separate Repairs notice for each finding"
+        },
+        "data_description": {
+          "threshold": "Continuous time offline. A brief recovery restarts the timer.",
+          "interval": "How often HA Doctor checks for new and resolved findings.",
+          "excluded": "Choose entities that are normally offline, such as a seasonal plug. Missing references are checked separately.",
+          "individual": "Off by default. Turn this on if you want to dismiss findings individually. Large installations can produce many notices."
+        }
+      }
+    },
+    "error": {
+      "whole_minutes": "Enter whole minutes for both time settings."
     }
   }
 }

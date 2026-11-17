@@ -1,6 +1,7 @@
 """Local, read-only Home Assistant diagnostics."""
 
 import logging
+from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -10,7 +11,7 @@ from homeassistant.helpers.start import async_at_started
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, NAME, OUTAGE_THRESHOLD, SCAN_INTERVAL
+from .const import DOMAIN, NAME, Settings
 from .scanner import Report, async_scan
 
 type DoctorEntry = ConfigEntry[DataUpdateCoordinator[Report | None]]
@@ -20,10 +21,12 @@ PLATFORMS = [Platform.SENSOR]
 async def async_setup_entry(hass: HomeAssistant, entry: DoctorEntry) -> bool:
     """Start scanning once the rest of Home Assistant has loaded."""
 
+    settings = Settings.from_options(entry.options)
+
     async def update() -> Report | None:
         if hass.state is not CoreState.running:
             return None
-        return async_scan(hass, dt_util.utcnow())
+        return async_scan(hass, dt_util.utcnow(), settings)
 
     coordinator = entry.runtime_data = DataUpdateCoordinator(
         hass,
@@ -31,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DoctorEntry) -> bool:
         config_entry=entry,
         name=NAME,
         update_method=update,
-        update_interval=SCAN_INTERVAL,
+        update_interval=timedelta(minutes=settings.interval),
         always_update=False,
     )
 
@@ -41,6 +44,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: DoctorEntry) -> bool:
         if report is None or not coordinator.last_update_success:
             return
         with ir.async_refresh_issues(hass, DOMAIN, config_entry_id=entry.entry_id):
+            if not settings.individual:
+                for category, count in (
+                    ("unavailable", len(report.unavailable)),
+                    ("missing", len(report.missing)),
+                ):
+                    if count:
+                        ir.async_create_issue(
+                            hass,
+                            DOMAIN,
+                            f"summary:{category}",
+                            config_entry_id=entry.entry_id,
+                            is_fixable=False,
+                            severity=ir.IssueSeverity.WARNING,
+                            translation_key=f"{category}_summary",
+                            translation_placeholders={"count": str(count)},
+                        )
+                return
             for entity in sorted(report.unavailable):
                 ir.async_create_issue(
                     hass,
@@ -52,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DoctorEntry) -> bool:
                     translation_key="unavailable",
                     translation_placeholders={
                         "entity": entity,
-                        "minutes": str(int(OUTAGE_THRESHOLD.total_seconds() / 60)),
+                        "minutes": str(settings.threshold),
                     },
                 )
             for source, target in sorted(report.missing):
