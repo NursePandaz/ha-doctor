@@ -11,14 +11,20 @@ Open **Settings → Devices & services → HA Doctor → Configure** (the gear b
 
 For example, if both your bedtime script and your evening lights automation refer to `light.old_porch`, you get two findings under **Review missing references**. Each names the source to inspect. When the reference becomes valid or you remove it and reload the edited source, the next scan clears the corresponding warning.
 
-## Install the private preview
+## Installation
 
-Requires **Home Assistant Core 2026.11.0 or newer**. To upgrade from 0.1.0, copy the new integration folder over the old one and restart Home Assistant. Your existing entry and sensor IDs carry over.
+Requires **Home Assistant Core 2026.11.0 or newer**.
 
-1. While signed in to GitHub with repository access, download and unzip the source from **Code → Download ZIP**.
+**With HACS:** Open HACS → ⋮ → **Custom repositories**. Add `https://github.com/NursePandaz/ha-doctor` with the **Integration** type. Open **HA Doctor** in HACS, choose **Download**, and continue from step 3 below. [HACS custom repository guide](https://www.hacs.xyz/docs/faq/custom_repositories/)
+
+**Manual installation**
+
+1. Download the installation ZIP attached to the [latest release](https://github.com/NursePandaz/ha-doctor/releases/latest) and unzip it.
 2. Copy the entire `custom_components/ha_doctor` folder into the `custom_components` directory beside your `configuration.yaml`. Create that directory if necessary. The installed manifest should be at `custom_components/ha_doctor/manifest.json`.
 3. Restart Home Assistant. Open **Settings → Devices & services → Add integration**, search for **HA Doctor**, and confirm setup.
 4. Open the HA Doctor device to see **Persistently unavailable entities** and **Missing entity references**. Add either sensor to a dashboard if you want a running count. Open **Settings → System → Repairs** for grouped notices.
+
+If upgrading manually from 0.1.0, copy the new integration folder over the old one and restart Home Assistant. Your existing entry and sensor IDs carry over.
 
 To try it without interrupting a device, save a temporary script with a light action targeting an unused literal ID such as `light.ha_doctor_example_missing`. Leave the script unexecuted. After the next scan, open **Review missing references** to see the script and light. Delete the test script. Its finding should disappear after the following scan. The grouped notice clears once the last finding of that type clears.
 
@@ -43,10 +49,6 @@ From the overview, choose **Advanced settings**. Saving a change reloads HA Doct
 - Dynamically computed targets, dashboards, device and area targets, invalid configurations that failed to load, and templates outside the reference index are outside the scan's coverage.
 - HA Doctor creates its own sensors and informational Repairs warnings. It never executes an automation, rewrites YAML, removes an entity, or applies a repair.
 - Choose **Download diagnostics** from the integration entry menu for support. HA Doctor's portion contains scan status, timing settings, and counts. Home Assistant adds its standard system metadata. Entity IDs are shown locally in Repairs.
-
-## HACS and Marketplace
-
-Private preview users install manually. Once the repository is public, it can be added as a custom repository using the GitHub URL and the **Integration** category. Catalog inclusion also requires passing HACS validation and hassfest, a full GitHub release, and a reviewed submission. The workflow enables HACS validation on public visibility. [Marketplace integration guide](https://contributors.home-assistant.io/marketplace/guides/integrations/) · [Catalog submission](https://contributors.home-assistant.io/marketplace/guides/catalog/) · [HACS repository requirements](https://www.hacs.xyz/docs/publish/start/)
 
 ## Development
 
