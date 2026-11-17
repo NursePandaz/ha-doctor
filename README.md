@@ -15,7 +15,11 @@ For example, if both your bedtime script and your evening lights automation refe
 
 Requires **Home Assistant Core 2026.11.0 or newer**.
 
-**With HACS:** Open HACS → ⋮ → **Custom repositories**. Add `https://github.com/NursePandaz/ha-doctor` with the **Integration** type. Open **HA Doctor** in HACS, choose **Download**, and continue from step 3 below. [HACS custom repository guide](https://www.hacs.xyz/docs/faq/custom_repositories/)
+**With HACS**
+
+Search for **HA Doctor** in HACS, open it, and choose **Download**. Restart Home Assistant, then open **Settings → Devices & services → Add integration**, search for **HA Doctor**, and confirm setup.
+
+If HA Doctor has yet to appear in your HACS catalog, open HACS → ⋮ → **Custom repositories**. Add `https://github.com/NursePandaz/ha-doctor` with the **Integration** type, then follow the HACS installation steps above. [HACS custom repository guide](https://www.hacs.xyz/docs/faq/custom_repositories/)
 
 **Manual installation**
 
