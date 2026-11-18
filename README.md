@@ -1,5 +1,9 @@
 # HA Doctor
 
+<p align="center">
+  <img src="docs/assets/ha-doctor-logo.svg" alt="HA Doctor — Home health, at a glance." width="720">
+</p>
+
 HA Doctor scans locally for offline entities and missing references in scripts and automations. By default, **Settings → System → Repairs** shows at most two HA Doctor notices, one for each type of problem.
 
 Open **Settings → Devices & services → HA Doctor → Configure** (the gear beside the entry) for your **Home health overview**. Choose **Review missing references** to see which automation or script needs attention, or **Review offline entities** to find the affected devices. The overview shows counts from the most recent successful scan. Each list shows up to 12 findings per page. Return to the overview and reopen a list to refresh it.
